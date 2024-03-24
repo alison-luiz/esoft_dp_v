@@ -1,18 +1,18 @@
 import bookModel from './book.schema'
 
-export class BookService {
+class BookService {
 
     async findAll() {
         try {
-            return bookModel.find()
+            return await bookModel.find()
         } catch (error) {
             console.error('Error occurred while getting books', error)
         }
     }
 
-    async findOne(id: string) {
+    async findById(id: string) {
         try {
-            return bookModel.findById(id)
+            return await bookModel.findById(id)
         } catch (error) {
             console.error('Error occurred while getting book', error)
         }
@@ -20,8 +20,7 @@ export class BookService {
 
     async create(book: any) {
         try {
-            const createdBook = bookModel.create(book)
-            return createdBook
+            return await bookModel.create(book)
         } catch (error) {
             console.error('Error occurred while creating book', error)
         }
@@ -29,8 +28,8 @@ export class BookService {
 
     async update(id: string, book: any) {
         try {
-            const updatedBook = bookModel.findByIdAndUpdate(id, book, { new: true })
-            return updatedBook
+            await bookModel.findByIdAndUpdate(id, book)
+            return this.findById(id)
         } catch (error) {
             console.error('Error occurred while updating book', error)
         }
@@ -38,10 +37,14 @@ export class BookService {
 
     async delete(id: string) {
         try {
-            const deletedBook = bookModel.findByIdAndDelete(id)
-            return deletedBook
+            await bookModel.findByIdAndDelete(id)
+            return {
+                message: 'Book deleted successfully'
+            }
         } catch (error) {
             console.error('Error occurred while deleting book', error)
         }
     }
 }
+
+export default new BookService()
