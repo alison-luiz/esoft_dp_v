@@ -1,7 +1,7 @@
 import express from 'express';
 import { routes } from './routes/routes';
 import { AppDataSource } from './src/shared/database/database.config';
-import { errorMiddleware } from './src/shared/middlewares/error';
+import { errorMiddleware } from './src/shared/middlewares/error.middleware';
 
 class App {
   public express: express.Application;
