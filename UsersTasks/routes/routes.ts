@@ -12,6 +12,7 @@ routes.post('/login', new UserController().login)
 routes.use(authMiddleware)
 
 routes.get('/profile', new UserController().getProfile)
+routes.patch('/profile', new UserController().updateProfile)
 
 routes.use(errorMiddleware)
 

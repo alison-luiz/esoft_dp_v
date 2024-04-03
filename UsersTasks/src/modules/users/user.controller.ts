@@ -1,62 +1,115 @@
-import bcrypt from 'bcrypt'
-import { Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
-import { BadRequestError } from '../../shared/helpers/api-erros'
-import { userRepository } from './user.repository'
+import bcrypt from "bcrypt";
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { BadRequestError } from "../../shared/helpers/api-erros";
+import { userRepository } from "./user.repository";
 
 export class UserController {
-	async create(req: Request, res: Response) {
-		const { username, email, password } = req.body
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { username, email, password } = req.body;
 
-		const userExists = await userRepository.findOneBy({ email })
+      if (!username || !email || !password) {
+        throw new BadRequestError("Invalid data");
+      }
 
-		if (userExists) {
-			throw new BadRequestError('E-mail já existe')
-		}
+      const userExists = await userRepository.findOneBy({ email });
 
-		const hashPassword = await bcrypt.hash(password, 10)
+      if (userExists) {
+        throw new BadRequestError("User already exists");
+      }
 
-		const newUser = userRepository.create({
-			username,
-			email,
-			password: hashPassword,
-		})
+      const hashPassword = await bcrypt.hash(password, 10);
 
-		await userRepository.save(newUser)
+      const newUser = userRepository.create({
+        username,
+        email,
+        password: hashPassword,
+      });
 
-		const { password: _, ...user } = newUser
+      await userRepository.save(newUser);
 
-		return res.status(201).json(user)
-	}
+      const { password: _, ...user } = newUser;
 
-	async login(req: Request, res: Response) {
-		const { email, password } = req.body
+      return res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-		const user = await userRepository.findOneBy({ email })
+  async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, password } = req.body;
 
-		if (!user) {
-			throw new BadRequestError('E-mail ou senha inválidos')
-		}
+      const user = await userRepository.findOneBy({ email });
 
-		const verifyPass = await bcrypt.compare(password, user.password)
+      if (!user) {
+        throw new BadRequestError("Email or password invalid");
+      }
 
-		if (!verifyPass) {
-			throw new BadRequestError('E-mail ou senha inválidos')
-		}
+      const verifyPass = await bcrypt.compare(password, user.password);
 
-		const token = jwt.sign({ id: user.id }, process.env.JWT_PASS ?? '', {
-			expiresIn: '8h',
-		})
+      if (!verifyPass) {
+        throw new BadRequestError("Email or password invalid");
+      }
 
-		const { password: _, ...userLogin } = user
+      const token = jwt.sign({ id: user.id }, process.env.JWT_PASS ?? "", {
+        expiresIn: "8h",
+      });
 
-		return res.json({
-			user: userLogin,
-			token: token,
-		})
-	}
+      const { password: _, ...userLogin } = user;
 
-	async getProfile(req: Request, res: Response) {
-		return res.json(req.user)
-	}
+      return res.json({
+        user: userLogin,
+        token: token,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      return res.json(req.user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { username, email, password, weight } = req.body;
+      const { id } = req.user;
+
+      const user = await userRepository.findOneBy({ id });
+
+      if (!user) {
+        throw new BadRequestError("User not found");
+      }
+
+      if (username) {
+        user.username = username;
+      }
+
+      if (email) {
+        user.email = email;
+      }
+
+      if (password) {
+        user.password = await bcrypt.hash(password, 10);
+      }
+
+      if (weight) {
+        user.weight = weight;
+      }
+
+      await userRepository.save(user);
+
+      const { password: _, ...userUpdated } = user;
+
+      return res.json(userUpdated);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

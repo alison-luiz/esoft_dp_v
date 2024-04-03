@@ -12,25 +12,27 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { authorization } = req.headers;
+  try {
+    const { authorization } = req.headers;
 
-  if (!authorization) {
-    throw new UnauthorizedError("unauthorized");
+    if (!authorization) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const token = authorization.split(" ")[1];
+
+    const { id } = jwt.verify(token, process.env.JWT_PASS ?? "") as JwtPayload;
+
+    const user = await userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { password: _, ...loggedUser } = user;
+
+    req.user = loggedUser;
+  } catch (error) {
+    next(error);
   }
-
-  const token = authorization.split(" ")[1];
-
-  const { id } = jwt.verify(token, process.env.JWT_PASS ?? "") as JwtPayload;
-
-  const user = await userRepository.findOneBy({ id });
-
-  if (!user) {
-    throw new UnauthorizedError("unauthorized");
-  }
-
-  const { password: _, ...loggedUser } = user;
-
-  req.user = loggedUser;
-
-  next();
 };
