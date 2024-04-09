@@ -59,10 +59,7 @@ export class UserController {
 
       const { password: _, ...userLogin } = user;
 
-      return res.json({
-        user: userLogin,
-        token: token,
-      });
+      return res.status(200).json({ user: userLogin, token });
     } catch (error) {
       next(error);
     }
@@ -70,7 +67,7 @@ export class UserController {
 
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      return res.json(req.user);
+      return res.status(200).json(req.user);
     } catch (error) {
       next(error);
     }
@@ -78,7 +75,7 @@ export class UserController {
 
   async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const { username, email, password, weight } = req.body;
+      const { username, email, weight } = req.body;
       const { id } = req.user;
 
       const user = await userRepository.findOneBy({ id });
@@ -95,10 +92,6 @@ export class UserController {
         user.email = email;
       }
 
-      if (password) {
-        user.password = await bcrypt.hash(password, 10);
-      }
-
       if (weight) {
         user.weight = weight;
       }
@@ -107,7 +100,38 @@ export class UserController {
 
       const { password: _, ...userUpdated } = user;
 
-      return res.json(userUpdated);
+      return res.status(200).json(userUpdated);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { old_password, new_password } = req.body;
+      const { id } = req.user;
+
+      const user = await userRepository.findOneBy({ id });
+
+      if (!user) {
+        throw new BadRequestError("User not found");
+      }
+
+      const verifyPass = await bcrypt.compare(old_password, user.password);
+
+      if (!verifyPass) {
+        throw new BadRequestError("Password invalid");
+      }
+
+      const hashPassword = await bcrypt.hash(new_password, 10);
+
+      user.password = hashPassword;
+
+      await userRepository.save(user);
+
+      const { password: _, ...userUpdated } = user;
+
+      return res.status(200).json(userUpdated);
     } catch (error) {
       next(error);
     }

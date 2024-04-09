@@ -32,6 +32,8 @@ export const authMiddleware = async (
     const { password: _, ...loggedUser } = user;
 
     req.user = loggedUser;
+
+    next();
   } catch (error) {
     next(error);
   }
