@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { TasksStatuses } from "../../../shared/utils/enums/tasks-statuses.enum";
 import { TasksType } from "../../../shared/utils/enums/tasks-type.enum";
-import { Categorie } from "../../categories/entities/categorie.entity";
+import { Category } from "../../categories/entities/category.entity";
 import { User } from "../../users/entities/user.entity";
 
 @Entity()
@@ -36,6 +36,6 @@ export class Task {
   @ManyToOne(() => User, (user) => user.tasks)
   user: User;
 
-  @ManyToOne(() => Categorie, (categorie) => categorie.tasks)
-  categorie: Categorie;
+  @ManyToOne(() => Category, (category) => category.tasks)
+  category: Category;
 }

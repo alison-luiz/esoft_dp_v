@@ -1,6 +1,6 @@
 import express from 'express';
 import { authRoutes } from './routes/auth.routes';
-import { categorieRoutes } from './routes/categorie.routes';
+import { categoryRoutes } from './routes/category.routes';
 import { AppDataSource } from './src/shared/database/database.config';
 import { errorMiddleware } from './src/shared/middlewares/error.middleware';
 
@@ -32,7 +32,7 @@ class App {
 
   private routes(): void {
     this.express.use(authRoutes);
-    this.express.use(categorieRoutes);
+    this.express.use(categoryRoutes);
   }
 
   private errorHandling(): void {

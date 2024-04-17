@@ -1,4 +1,4 @@
-export enum CategorieColors {
+export enum CategoriesColors {
   RED = '#FF0000',
   BLUE = '#0000FF',
   GREEN = '#008000',
