@@ -1,6 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { TasksStatuses } from "../../../shared/utils/enums/tasks-statuses.enum";
-import { TasksType } from "../../../shared/utils/enums/tasks-type.enum";
 import { Category } from "../../categories/entities/category.entity";
 import { User } from "../../users/entities/user.entity";
 
@@ -26,9 +25,6 @@ export class Task {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @Column({ type: "enum", enum: TasksType })
-  task: TasksType;
 
   @Column({ type: "enum", enum: TasksStatuses })
   status: TasksStatuses;
