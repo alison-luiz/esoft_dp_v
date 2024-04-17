@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "../../../shared/helpers/api-erros";
 import { taskTypeRepository } from "../repositories/task-type.repository";
+import { taskRepository } from "../repositories/task.repository";
 
 export class TaskTypeController {
   async findAll(req: Request, res: Response, next: NextFunction) {
@@ -106,6 +107,14 @@ export class TaskTypeController {
 
       if (!taskType) {
         throw new NotFoundError("Task Type not found");
+      }
+
+      const task = await taskRepository.findOne({
+        where: { taskTypeId: Number(id) },
+      });
+
+      if (task) {
+        throw new BadRequestError("Task Type is being used");
       }
 
       await taskTypeRepository.delete(Number(id));

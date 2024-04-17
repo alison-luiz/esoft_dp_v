@@ -15,9 +15,15 @@ export class Task {
   description: string;
 
   @Column()
-  creationDate: Date;
+  taskTypeId: number;
+
+  @Column({ type: "enum", enum: TasksStatuses })
+  status: TasksStatuses;
 
   @Column()
+  creationDate: Date;
+
+  @Column({ nullable: true })
   conclusionDate: Date;
 
   @CreateDateColumn()
@@ -25,9 +31,6 @@ export class Task {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @Column({ type: "enum", enum: TasksStatuses })
-  status: TasksStatuses;
 
   @ManyToOne(() => User, (user) => user.tasks)
   user: User;

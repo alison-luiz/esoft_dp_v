@@ -13,7 +13,6 @@ taskTypeRoutes.post('/task-type', new TaskTypeController().create)
 taskTypeRoutes.put('/task-type/:id', new TaskTypeController().update)
 taskTypeRoutes.delete('/task-type/:id', new TaskTypeController().delete)
 
-
 taskTypeRoutes.use(errorMiddleware)
 
 export { taskTypeRoutes }
