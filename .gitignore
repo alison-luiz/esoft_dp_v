@@ -1,3 +1,5 @@
 Books/node_modules
 UsersTasks/node_modules
 UsersTasks/.env
+produto-nestjs/node_modules
+produto-nestjs/dist
