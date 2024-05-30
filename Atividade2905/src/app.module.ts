@@ -1,6 +1,8 @@
 import { MongooseModule } from '@nestjs/mongoose';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ProductModule } from './modules/product/product.module';
+import { ProductMiddleware } from './modules/product/product.middleware';
+import { ProductController } from './modules/product/product.controller';
 
 @Module({
   imports: [
@@ -9,4 +11,10 @@ import { ProductModule } from './modules/product/product.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(ProductMiddleware)
+      .forRoutes(ProductController);
+  }
+}
